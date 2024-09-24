@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9400:9400"
+    volumes:
+      - .:/usr/src/app
+    command: air main.go -b 0.0.0.0
