@@ -14,7 +14,7 @@ docker/build:
 
 ## docker/up: 在后台运行
 docker/up:
-	docker-compose up 
+	docker-compose up -d
 
 ## docker/down: 停止 docker compose 
 docker/down:

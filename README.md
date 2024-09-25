@@ -4,23 +4,21 @@
 
 - 安装
 
-构建 `docker compose build`
+执行 `npm install && npm run dev`  --安装前端依赖和监听tailwindcss
 
+构建 `docker compose build`
 
 运行 `docker compose up`
 
-- 开发启动
+或者 查看 `Makefile` 文件执行对应命令
 
-`npm install && npm run dev`  --安装和监听tailwindcss
-
-`docker compose run --service-ports web bash` --启动web服务
 
 ## 技术栈
 
 
 ## 好记性不如烂笔头
 
-发现 `templ` 和 `HTMX` 很有意思，第一次尝试，记录一下，方便回忆。
+发现 `templ` 和 `HTMX` 很有意思，第一次尝试，记录一下，方便复盘。
 
 ### 使用docker构建开发依赖
 
