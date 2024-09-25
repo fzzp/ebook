@@ -1,5 +1,7 @@
 # ebook
 
+开发一个在线电子书web服务。
+
 - 安装
 
 构建 `docker compose build`
@@ -12,6 +14,8 @@
 `npm install && npm run dev`  --安装和监听tailwindcss
 
 `docker compose run --service-ports web bash` --启动web服务
+
+## 技术栈
 
 
 ## 好记性不如烂笔头

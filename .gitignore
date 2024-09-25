@@ -1,2 +1,4 @@
 node_modules
 *_cmd.txt
+tmp
+storage
