@@ -8,7 +8,7 @@ import (
 
 	"github.com/fzzp/ebook/components"
 	dbrepo "github.com/fzzp/ebook/dbrepo/sqlc"
-	formdto "github.com/fzzp/ebook/formDto"
+	"github.com/fzzp/ebook/formdto"
 	"github.com/fzzp/ebook/services"
 	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"

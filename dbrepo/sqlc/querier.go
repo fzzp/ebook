@@ -10,9 +10,18 @@ import (
 )
 
 type Querier interface {
+	CreateBook(ctx context.Context, arg CreateBookParams) (sql.Result, error)
+	CreateCategory(ctx context.Context, categoryName string) (sql.Result, error)
+	CreateSession(ctx context.Context, arg CreateSessionParams) (sql.Result, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (sql.Result, error)
+	GetAllCategory(ctx context.Context) ([]*Category, error)
+	GetBookByID(ctx context.Context, id uint64) (*Book, error)
+	GetBookList(ctx context.Context, arg GetBookListParams) ([]*Book, error)
+	GetBooksByCategory(ctx context.Context, categoryID uint64) ([]*Book, error)
 	GetUserByEmail(ctx context.Context, email string) (*User, error)
 	GetUserByID(ctx context.Context, id uint64) (*User, error)
+	GetUserByToken(ctx context.Context, tokenHash string) (*User, error)
+	UpdateBook(ctx context.Context, arg UpdateBookParams) error
 	UpdateUser(ctx context.Context, arg UpdateUserParams) error
 }
 

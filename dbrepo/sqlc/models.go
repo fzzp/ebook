@@ -8,6 +8,98 @@ import (
 	"time"
 )
 
+// 图书表
+type Book struct {
+	// 主键
+	ID uint64 `json:"id"`
+	// 书名
+	BookTitle string `json:"book_title"`
+	// 图片编号
+	BookIsbn string `json:"book_isbn"`
+	// 封面
+	BookCover string `json:"book_cover"`
+	// 作者
+	BookAuthor string `json:"book_author"`
+	// 实体书价格，单位分
+	BookPrice uint32 `json:"book_price"`
+	// 实体书库存
+	BookInventory uint32 `json:"book_inventory"`
+	// 电子书价格,单位分
+	EbookPrice uint32 `json:"ebook_price"`
+	// 发布年份
+	PublishAt time.Time `json:"publish_at"`
+	// 版本号
+	Version int32 `json:"version"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at"`
+	// 更新时间
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+// 分类表
+type Category struct {
+	// 主键
+	ID uint64 `json:"id"`
+	// 分类名
+	CategoryName string `json:"category_name"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at"`
+	// 更新时间
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+// 分类图书关系表
+type CategoryBook struct {
+	// 分类主键
+	CategoryID uint64 `json:"category_id"`
+	// 图书主键
+	BookID uint64 `json:"book_id"`
+}
+
+// 电子书文件表
+type EbookFile struct {
+	// 主键
+	ID uint64 `json:"id"`
+	// 图书主键
+	BookID uint64 `json:"book_id"`
+	// 文件类型
+	FileType string `json:"file_type"`
+	// 下载地址
+	DownloadUrl string `json:"download_url"`
+}
+
+// 订单表
+type Order struct {
+	// 主键
+	ID uint64 `json:"id"`
+	// 用户主键
+	UserID uint64 `json:"user_id"`
+	// 图书主键
+	BookID uint64 `json:"book_id"`
+	// 1:电子书,2:实体书
+	OrderType bool `json:"order_type"`
+	// 总金额，单位分
+	OrderAmount uint32 `json:"order_amount"`
+	// 支付状态: 0未支付 1已支付
+	OrderStatus bool `json:"order_status"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at"`
+	// 更新时间
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+// 会话表
+type Session struct {
+	// 主键
+	ID uint64 `json:"id"`
+	// 用户主键
+	UserID uint64 `json:"user_id"`
+	// 会话id
+	TokenHash string `json:"token_hash"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at"`
+}
+
 // 用户表
 type User struct {
 	// 主键

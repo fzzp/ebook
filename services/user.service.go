@@ -4,7 +4,7 @@ import (
 	"context"
 
 	dbrepo "github.com/fzzp/ebook/dbrepo/sqlc"
-	formdto "github.com/fzzp/ebook/formDto"
+	"github.com/fzzp/ebook/formdto"
 	"golang.org/x/crypto/bcrypt"
 )
 
