@@ -7,11 +7,11 @@ tmp_dir = "tmp"
 
 [build]
 # Array of commands to run before each build
-pre_cmd = ["echo 'hello air' > pre_cmd.txt"]
+# pre_cmd = ["echo 'hello air' > pre_cmd.txt"]
 # Just plain old shell command. You could use `make` as well.
-cmd = "templ generate &&  go build -o ./tmp/main ."
+cmd = "templ generate &&  go build -o ./tmp/main ./cmd/web/*.go"
 # Array of commands to run after ^C
-post_cmd = ["echo 'hello air' > post_cmd.txt"]
+# post_cmd = ["echo 'hello air' > post_cmd.txt"]
 # Binary file yields from `cmd`.
 bin = "tmp/main"
 # Customize binary, can setup environment variables when run your app.
@@ -21,7 +21,7 @@ args_bin = ["hello", "world"]
 # Watch these filename extensions.
 include_ext = ["go", "tpl", "tmpl", "templ", "html"]
 # Ignore these filename extensions or directories.
-exclude_dir = ["assets", "tmp", "vendor", "node_modules"]
+exclude_dir = ["assets", "tmp", "vendor", "views/node_modules", "storage"]
 # Watch these directories if you specified.
 include_dir = []
 # Watch these files.

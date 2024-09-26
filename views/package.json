@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tailwindcss -i tailwind.css -o static/css/tailwind.css --watch"
+    "dev": "npx tailwindcss -i ./tailwind/app.css -o ./static/css/app.css --minify --watch"
   },
   "keywords": [],
   "author": "lightsaid@163.com",

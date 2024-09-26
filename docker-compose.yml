@@ -2,6 +2,7 @@ version: '3.9'
 
 services:
   web:
+    container_name: ebook_web
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,14 +12,19 @@ services:
       - "${WEB_PORT}:9400"
     volumes:
       - .:/usr/src/app
-    command: air main.go -b 0.0.0.0
+    depends_on:
+      - mysql
+      # - rabbitmq
+      # - minio
+    command: air cmd/web/*.go -b 0.0.0.0
 
-  mysqldb:
+  mysql:
     image: "mysql:5.7.22"
+    container_name: ebook_mysql
     ports:
       # mysql端口映射，属主机使用这个mysql服务，用DB_PORT端口；而容器之间使用则用 3306
-      - "${DB_PORT}:3306"  
-    restart: always  # 总是启动，当docker启动时，就会启动这个服务
+      - "${DB_PORT}:3306"
+    # restart: always # 总是启动，当docker启动时，就会启动这个服务
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
@@ -27,3 +33,25 @@ services:
       - ${DB_STORAGE}:/var/lib/mysql
     networks:
       - default
+
+  minio:
+    image: quay.io/minio/minio
+    container_name: ebook_minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_USER_PASSWORD}
+    volumes:
+      - ${MINIO_STORAGE}:/data
+    command: server /data --console-address ":9001"
+
+  rabbitmq:
+    image: 'rabbitmq:4.0.2-management-alpine'
+    container_name: ebook_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ${RABBITMQ_STORAGE}:/var/lib/rabbitmq

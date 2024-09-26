@@ -1,6 +1,6 @@
 version: "2"
 sql:
-- schema: "migrations"
+- schema: "dbrepo/migrations"
   queries: "dbrepo/query"
   engine: "mysql"
   gen:
