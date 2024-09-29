@@ -1,5 +1,29 @@
 package portal
 
+import (
+"github.com/fzzp/ebook/views/layout"
+)
+
 templ Login() {
-    <h1 class="text-sm">Login</h1>
+@layout.BlankLayout() {
+    <body class="bg-gray-200">
+        <div class="form-card">
+            <form hx-post="/login">
+                <h4 class="text-sky-500 text-2xl mb-4 text-center">登陆</h4>
+                <div class="mb-4 flex items-center">
+                    <label for="email" class="w-20 text-right">邮箱:</label>
+                    <input type="email" class="form-input" id="email" name="email">
+                </div>
+                <div class="mb-4 flex items-center">
+                    <label for="password" class="w-20 text-right">密码:</label>
+                    <input type="password" class="form-input" id="password" name="password">
+                </div>
+                <div class="mb-4">
+                    <button type="submit" class="form-btn mx-auto">登陆</button>
+                    <div class="text-center mt-4">没有账号？<a href="/signup"  class="text-sky-400 underline">注册</a></div>
+                </div>
+            </form>
+        </div>
+    </body>
+    }
 }

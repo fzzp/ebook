@@ -22,8 +22,7 @@ services:
     image: "mysql:5.7.22"
     container_name: ebook_mysql
     ports:
-      # mysql端口映射，属主机使用这个mysql服务，用DB_PORT端口；而容器之间使用则用 3306
-      - "${DB_PORT}:3306"
+      - "3308:3306"
     # restart: always # 总是启动，当docker启动时，就会启动这个服务
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}

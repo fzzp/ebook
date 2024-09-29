@@ -1,84 +1,103 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	dbrepo "github.com/fzzp/ebook/dbrepo/sqlc"
-	"github.com/fzzp/ebook/internal/formdto"
+	"github.com/fzzp/ebook/internal/controllers"
 	"github.com/fzzp/ebook/internal/services"
-	"github.com/fzzp/ebook/views/layout"
-	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
-)
-
-var (
-	formDec = form.NewDecoder()
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	fmt.Println("Hello Go!")
-
-	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		"root",
-		"ebook_scret",
-		"ebook_mysql",
-		3306,
-		"ebook",
-	)
-
-	conn, err := openDB(dsn)
+	// 加载配置
+	err := godotenv.Load()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	store := dbrepo.NewSQLStore(conn)
-	svc := services.NewUserService(store)
+	// 设置 json 格式 slog
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
 
-	mux := http.NewServeMux()
+	// 连接 mysql
+	conn, err := openDB()
+	if err != nil {
+		slog.Error("打开数据库失败: " + err.Error())
+		os.Exit(1)
+	}
+	defer conn.Close()
+	conn.SetMaxOpenConns(25)
+	conn.SetMaxIdleConns(25)
+	conn.SetConnMaxIdleTime(25 * time.Minute)
+
+	// 创建service层
+	store := dbrepo.NewSQLStore(conn)
+	userSvc := services.NewUserService(store)
+
+	repo := controllers.NewRepository(userSvc)
+
+	mux := NewRouter(repo)
 
 	fileServer := http.FileServer(http.Dir("./views/static"))
 
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 
-	mux.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-		if err := layout.AdminLayout().Render(r.Context(), w); err != nil {
-			slog.Error("组件渲染失败", slog.String("error", err.Error()))
-		}
-	})
+	server := http.Server{
+		Addr:         fmt.Sprintf(":%s", os.Getenv("WEB_PORT")),
+		Handler:      mux,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 20 * time.Second,
+		IdleTimeout:  2 * time.Minute,
+		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
+	}
 
-	mux.HandleFunc("/showimg", func(w http.ResponseWriter, r *http.Request) {
-		layout.ShowImg().Render(r.Context(), w)
-	})
-
-	mux.HandleFunc("POST /signup", func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
+	go func() {
+		slog.Info("start on " + server.Addr)
+		err = server.ListenAndServe()
 		if err != nil {
-			panic(err)
+			slog.Error("server.ListenAndServe error: " + err.Error())
+			os.Exit(1)
 		}
+	}()
 
-		var input formdto.CreateUserRequest
-		if err = formDec.Decode(&input, r.PostForm); err != nil {
-			panic(err)
-		}
+	// 优雅关机
+	quitChan := make(chan os.Signal, 1)
+	signal.Notify(quitChan, syscall.SIGINT, syscall.SIGTERM)
 
-		err = svc.CreateUser(r.Context(), input)
-		if err != nil {
-			fmt.Fprintf(w, "%s", err.Error())
-			return
-		}
+	sig := <-quitChan
 
-		fmt.Fprintf(w, "%s", "注册成功!")
-	})
+	slog.Info("获取到系统退出信号", slog.Any("sig", sig))
 
-	fmt.Println("start on 9400")
-	http.ListenAndServe(":9400", mux)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	err = server.Shutdown(ctx)
+	if err != nil {
+		slog.Error("server.Shutdown error: " + err.Error())
+		os.Exit(1)
+	}
+
 }
 
-func openDB(dsn string) (*sql.DB, error) {
+func openDB() (*sql.DB, error) {
+	dsn := fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		"ebook_mysql", // 容器名
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_NAME"),
+	)
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
