@@ -3,7 +3,6 @@ package email
 import (
 	"fmt"
 	"net/smtp"
-	"os"
 
 	"github.com/jordan-wright/email"
 )
@@ -42,7 +41,6 @@ func NewMailSender(
 	fromEmailAddress string,
 	fromEmailPassword string,
 ) Mailer {
-	fmt.Printf(">>>>> smtpAuthAddress=%s, smtpServerAddress=%s\n", smtpAuthAddress, smtpServerAddress)
 	return &MailSender{
 		smtpAuthAddress:   smtpAuthAddress,
 		smtpServerAddress: smtpServerAddress,
@@ -55,8 +53,6 @@ func NewMailSender(
 // SendEmail 发送邮件接口
 // subject 主题、content 内容、to 发给谁、cc 抄送给谁、bcc 密件抄送、attachFiles 附件
 func (sender *MailSender) SendEmail(subject string, content string, to []string, cc []string, bcc []string, attachFiles []string) error {
-	fmt.Printf(">>>>> 1111 smtpAuthAddress=%s, smtpServerAddress=%s\n", sender.smtpAuthAddress, sender.smtpServerAddress)
-
 	mail := email.NewEmail()
 	mail.From = sender.fromName + "<" + sender.fromEmailAddress + ">"
 	mail.Subject = subject
@@ -72,15 +68,7 @@ func (sender *MailSender) SendEmail(subject string, content string, to []string,
 		}
 	}
 
-	var auth smtp.Auth
-	if os.Getenv("ENV") == "prod" {
-		// NOTE: 会走TLS加密
-		// identity 通常是空字符串
-		auth = smtp.PlainAuth("", sender.fromEmailAddress, sender.fromEmailPassword, sender.smtpAuthAddress)
-	} else {
-		// 非加密
-		auth = smtp.CRAMMD5Auth(sender.fromName, sender.fromEmailPassword)
-	}
+	auth := smtp.PlainAuth("", sender.fromEmailAddress, sender.fromEmailPassword, sender.smtpAuthAddress)
 
 	return mail.Send(sender.smtpServerAddress, auth)
 }
